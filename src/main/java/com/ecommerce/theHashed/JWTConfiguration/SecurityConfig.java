@@ -15,6 +15,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.ecommerce.theHashed.security.oauth2.CustomOAuth2UserService;
+import com.ecommerce.theHashed.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.ecommerce.theHashed.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.ecommerce.theHashed.security.oauth2.OAuth2AuthenticationSuccessHandler;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -29,10 +34,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //		BCryptPasswordEncoder eEncrypt;
 	    @Autowired
 	    private JwtAuthenticationEntryPoint unauthorizedHandler;
+	    @Autowired
+	    private CustomOAuth2UserService customOAuth2UserService;
+	    
+
+	    @Autowired
+	    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+	    @Autowired
+	    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+	    @Autowired
+	    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 	    
 	    @Bean
 	    public JwtAuthenticationFilter jwtAuthenticationFilter() {
 	        return new JwtAuthenticationFilter();
+	    }
+	    
+	    @Bean
+	    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+	        return new HttpCookieOAuth2AuthorizationRequestRepository();
 	    }
 
 	    @Override
@@ -76,16 +98,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	                        "/**/*.css",
 	                        "/**/*.js")
 	                        .permitAll()
+	                    .antMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()    
 	                    .antMatchers("/api/status/**","/api/login/**","/api/signup/**","/api/accountType/**","/api/customerCurrency/**")
 	                        .permitAll()
-//	                    .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
-//	                        .permitAll().antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
 	                        .antMatchers(HttpMethod.GET, "/api/status/**")
 	                        .permitAll()
 	                    .anyRequest()
-	                        .authenticated();
+	                        .authenticated()
+	                        .and()
+	                        .oauth2Login()
+	                        .authorizationEndpoint()
+	                            .baseUri("/oauth2/authorize")
+	                            .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+	                            .and()
+	                        .redirectionEndpoint()
+	                            .baseUri("/oauth2/callback/*")
+	                            .and()
+	                        .userInfoEndpoint()
+	                            .userService(customOAuth2UserService)
+	                            .and()
+	                        .successHandler(oAuth2AuthenticationSuccessHandler)
+	                        .failureHandler(oAuth2AuthenticationFailureHandler);
 
-	        // Add our custom JWT security filter
 	        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 	    }

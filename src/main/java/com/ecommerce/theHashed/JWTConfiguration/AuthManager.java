@@ -26,7 +26,6 @@ public class AuthManager {
 	    CustomerAccount user;
 	    Base64.Decoder dec = Base64.getDecoder();
 		try {
-			logger.info("user is going to validate(AuthManager) "+username);
 			if(userService == null) {
 				 logger.info("user found the error");
 				 throw new BadCredentialsException("1001");
@@ -35,13 +34,14 @@ public class AuthManager {
 			 if (user == null) {
 			        throw new BadCredentialsException("User Not found!!");
 			  }
+			 if(user.getPassword() != null) {
 			 String decoded = new String(dec.decode(user.getPassword()));
-			 logger.info("from authentication "+password+" from db "+decoded);
 			 if(!this.passwordMatch(password, decoded)) {
-				 logger.info("Password is wrong for user .."+user.getEmailId()+"-- "+user.getMobileNo());
 				 throw new BadCredentialsException("username or password is wrong.");
 			 } 
-
+			 } else {
+				 throw new BadCredentialsException("User Not found!!");
+			 }
 		        return new UsernamePasswordAuthenticationToken(new UserPrincipal(user.getId(), username, password), password);
 		} catch (Exception e) {
 			logger.info("Error",e);

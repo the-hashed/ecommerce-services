@@ -1,9 +1,12 @@
 package com.ecommerce.theHashed.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.sun.istack.NotNull;
+
 
 /**
  * The persistent class for the customer_account database table.
@@ -19,7 +24,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="customer_account")
-public class CustomerAccount{
+public class CustomerAccount implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +70,22 @@ public class CustomerAccount{
 	@Column(name = "passwordResetCompleted")
 	private Boolean passwordResetCompleted;
 	
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "provider")
+	private AuthProvider provider;
+	
+	@Column(name = "provider_id")
+	private String providerId;
+	
+	public AuthProvider getProvider() {
+		return provider;
+	}
+
+	public void setProvider(AuthProvider provider) {
+		this.provider = provider;
+	}
+
 	public CustomerAccount() {
 	}
 
@@ -158,6 +184,14 @@ public class CustomerAccount{
 
 	public void setPasswordResetCompleted(Boolean passwordResetCompleted) {
 		this.passwordResetCompleted = passwordResetCompleted;
+	}
+
+	public String getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
 	}
 
 }
