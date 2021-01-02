@@ -32,8 +32,26 @@ public class CustomerAccount implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String id;
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CustomerAccount)) {
+			return false;
+		}
+		CustomerAccount other = (CustomerAccount) obj;
+		return getId().equals(other.getId());
+	}
+
 
 	@Column(name = "created_at")
 	private Timestamp createdAt;
@@ -78,6 +96,9 @@ public class CustomerAccount implements Serializable {
 	@Column(name = "provider_id")
 	private String providerId;
 	
+	@Column(name = "provider_update_at")
+	private Timestamp providerUpdatedAt;
+	
 	public AuthProvider getProvider() {
 		return provider;
 	}
@@ -89,11 +110,11 @@ public class CustomerAccount implements Serializable {
 	public CustomerAccount() {
 	}
 
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -192,6 +213,14 @@ public class CustomerAccount implements Serializable {
 
 	public void setProviderId(String providerId) {
 		this.providerId = providerId;
+	}
+
+	public Timestamp getProviderUpdatedAt() {
+		return providerUpdatedAt;
+	}
+
+	public void setProviderUpdatedAt(Timestamp providerUpdatedAt) {
+		this.providerUpdatedAt = providerUpdatedAt;
 	}
 
 }

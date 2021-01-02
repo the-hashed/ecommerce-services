@@ -11,4 +11,6 @@ public interface CustomerAccountRepository extends JpaRepository<CustomerAccount
 	Optional<CustomerAccount> findByMobileNo(String mobile);
 
 	Optional<CustomerAccount> findByEmailId(String email);
+
+	Optional<CustomerAccount> findById(String userId);
 }

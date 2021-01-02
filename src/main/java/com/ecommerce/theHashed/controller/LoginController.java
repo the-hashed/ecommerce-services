@@ -88,7 +88,7 @@ public class LoginController {
 	    	return null;
 	    }
 	 
-	 	private long _getUserId() {
+	 	private String _getUserId() {
 	    	logger.info("user id vaildating. "+ SecurityContextHolder.getContext().getAuthentication());
 			UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			logger.info("(LoginController)user id is "+userPrincipal.getId());

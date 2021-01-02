@@ -1,8 +1,10 @@
 package com.ecommerce.theHashed.service.UserServices.impl;
 
 import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public CustomerAccount getUserDetailById(long userId) throws Exception {
+	public CustomerAccount getUserDetailById(String userId) throws Exception {
 		return userRepo.findById(userId).orElseThrow(()->new Exception("User Not found.."));
 	}
 
@@ -67,35 +69,39 @@ public class UserServiceImpl implements UserService {
 					cusmtomerOfSocial.setMobileNo(signupRequest.get("mobile"));
 					String encoded = enc.encodeToString(signupRequest.get("password").getBytes());
 					cusmtomerOfSocial.setPassword(encoded);
-					Optional<AccountType> a = accountType.findById(Long.parseLong(signupRequest.get("accounttype")));
+					Optional<AccountType> a = accountType.findByAccountType(signupRequest.get("accounttype"));
 					if(a.isPresent())
 						cusmtomerOfSocial.setAccountType(a.get());
-					Optional<CustomerCurrency> c = customerCurrency.findById(Long.parseLong(signupRequest.get("currency")));
+					Optional<CustomerCurrency> c = customerCurrency.findByCurrencyName(signupRequest.get("currency"));
 					if(c.isPresent())
 						cusmtomerOfSocial.setCustomerCurrency(c.get());
 					cusmtomerOfSocial.setEmailVerified(false);
 					cusmtomerOfSocial.setPasswordResetCompleted(false);
 					cusmtomerOfSocial.setMobileVerified(false);
 					cusmtomerOfSocial.setProvider(AuthProvider.local);
+					cusmtomerOfSocial.setProviderUpdatedAt(new Timestamp(System.currentTimeMillis()));
 					userRepo.save(cusmtomerOfSocial);
 					return cusmtomerOfSocial;
 				}
 			} else {
 			CustomerAccount user = new CustomerAccount();
+			String uniqueID = UUID.randomUUID().toString();
+			user.setId(uniqueID);
 			user.setFirstName(signupRequest.get("firstname"));
 			user.setLastName(signupRequest.get("lastname"));
 			user.setEmailId(signupRequest.get("email"));
 			user.setMobileNo(signupRequest.get("mobile"));
 			String encoded = enc.encodeToString(signupRequest.get("password").getBytes());
 			user.setPassword(encoded);
-			Optional<AccountType> a = accountType.findById(Long.parseLong(signupRequest.get("accounttype")));
+			Optional<AccountType> a = accountType.findByAccountType(signupRequest.get("accounttype"));
 			if(a.isPresent())
 			user.setAccountType(a.get());
-			Optional<CustomerCurrency> c = customerCurrency.findById(Long.parseLong(signupRequest.get("currency")));
+			Optional<CustomerCurrency> c = customerCurrency.findByCurrencyName(signupRequest.get("currency"));
 			if(c.isPresent())
 			user.setCustomerCurrency(c.get());
 			user.setEmailVerified(false);
 			user.setPasswordResetCompleted(false);
+			user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 			user.setMobileVerified(false);
 			user.setProvider(AuthProvider.local);
 			userRepo.save(user);

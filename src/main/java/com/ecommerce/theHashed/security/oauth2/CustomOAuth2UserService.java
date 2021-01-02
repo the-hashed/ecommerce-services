@@ -1,8 +1,9 @@
 package com.ecommerce.theHashed.security.oauth2;
 
 
+import java.sql.Timestamp;
 import java.util.Optional;
-
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -66,12 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	        CustomerAccount user;
 	        if(userOptional.isPresent()) {
 	            user = userOptional.get();
-	            if(!user.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
-	                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-	                        user.getProvider() + " account. Please use your " + user.getProvider() +
-	                        " account to login.");
-	            }
-	            user = updateExistingUser(user, oAuth2UserInfo);
+	            user = updateExistingUser(user, oAuth2UserRequest, oAuth2UserInfo);
 	        } else {
 	            user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
 	        }
@@ -92,27 +88,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		     else{
 		       firstName = fullname;
 		    }
-	    	
+		    String uniqueID = UUID.randomUUID().toString();
+		    user.setId(uniqueID);
 	        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
 	        user.setProviderId(oAuth2UserInfo.getId());
 	        user.setFirstName(firstName);
 	        user.setLastName(lastName);
 	        user.setEmailId(oAuth2UserInfo.getEmail());
-	        Optional<AccountType> a = accountType.findById(Long.parseLong("4"));
+	        Optional<AccountType> a = accountType.findByAccountType("WEB");
 			if(a.isPresent())
 			user.setAccountType(a.get());
-			Optional<CustomerCurrency> c = customerCurrency.findById(Long.parseLong("1"));
+			Optional<CustomerCurrency> c = customerCurrency.findByCurrencyName("INR");
 			if(c.isPresent())
 			user.setCustomerCurrency(c.get());
 			user.setEmailVerified(false);
 			user.setPasswordResetCompleted(false);
 			user.setMobileVerified(false);
 			user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-	        
+	        user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 	        return customerAccountRepository.save(user);
 	    }
 
-	    private CustomerAccount updateExistingUser(CustomerAccount existingUser, OAuth2UserInfo oAuth2UserInfo) {
+	    private CustomerAccount updateExistingUser(CustomerAccount existingUser, OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
 	    	String fullname = oAuth2UserInfo.getName();
 	    	String lastName = "";
 		    String firstName= "";
@@ -127,6 +124,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	    	
 	        existingUser.setFirstName(firstName);
 	        existingUser.setFirstName(lastName);
+	        if(!AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()).equals((existingUser.getProvider().toString()))) {
+	        existingUser.setProviderUpdatedAt(new Timestamp(System.currentTimeMillis()));
+	        existingUser.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
+	        existingUser.setProviderId(oAuth2UserInfo.getId());
+	        }
 	        return customerAccountRepository.save(existingUser);
 	    }
 

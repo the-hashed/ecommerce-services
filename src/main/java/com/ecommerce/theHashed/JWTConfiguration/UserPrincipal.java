@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 public class UserPrincipal  implements UserDetails {
-	   private Long id;
+	   private String id;
 
 		    @JsonIgnore
 	    private String mobile;
@@ -21,7 +21,7 @@ public class UserPrincipal  implements UserDetails {
 
 	    private Collection<? extends GrantedAuthority> authorities;
 
-	    public UserPrincipal(Long id, String mobile, String password) {
+	    public UserPrincipal(String id, String mobile, String password) {
 	        this.id = id;
 	   
 	        this.mobile = mobile;
@@ -39,7 +39,7 @@ public class UserPrincipal  implements UserDetails {
 	        );
 	    }
 
-	    public Long getId() {
+	    public String getId() {
 	        return id;
 	    }
 

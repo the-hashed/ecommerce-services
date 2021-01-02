@@ -34,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // This method is used by JWTAuthenticationFilter
     @Transactional
-    public UserDetails loadUserById(Long id) {
+    public UserDetails loadUserById(String id) {
     	try {
     		CustomerAccount user = userService.getUserDetailById(id);
    	        return UserPrincipal.create(user);
