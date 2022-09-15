@@ -6,11 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import com.ecommerce.theHashed.model.CustomerAccount;
 @Repository
-public interface CustomerAccountRepository extends JpaRepository<CustomerAccount, Long> {
+public interface CustomerAccountRepository extends JpaRepository<CustomerAccount, String> {
 	
 	Optional<CustomerAccount> findByMobileNo(String mobile);
 
 	Optional<CustomerAccount> findByEmailId(String email);
-
-	Optional<CustomerAccount> findById(String userId);
 }

@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.theHashed.controller.RequestPojo.ApiResponse;
-import com.ecommerce.theHashed.model.AccountType;
 import com.ecommerce.theHashed.model.CustomerCurrency;
-import com.ecommerce.theHashed.service.UserServices.AccountTypeService;
 import com.ecommerce.theHashed.service.UserServices.CustomerCurrencyService;
 
 @RestController
@@ -19,9 +17,8 @@ public class CustomerCurrencyController {
 	@Autowired
 	CustomerCurrencyService customerCurrencyService;
 	@RequestMapping("customerCurrency")
-	public ResponseEntity<?> userLogin() {
+	public ResponseEntity<?> userCurrency() {
 		try {
-			//TODO validation has to add for client request
 			List<CustomerCurrency> account = customerCurrencyService.insertCustomerCurrency();
 			return  ResponseEntity.ok(account);
 		}catch(Exception e ) {

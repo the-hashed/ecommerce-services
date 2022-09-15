@@ -11,7 +11,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 public class UserPrincipal  implements UserDetails {
-	   private String id;
+	   /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String id;
 
 		    @JsonIgnore
 	    private String mobile;

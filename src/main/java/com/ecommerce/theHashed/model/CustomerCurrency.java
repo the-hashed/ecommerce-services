@@ -1,7 +1,6 @@
 package com.ecommerce.theHashed.model;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 import javax.persistence.*;
 /**

@@ -118,41 +118,45 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public void registerNewCustomerAfterOauthLoginSuccess(String email, String name, AuthProvider auth) {
-			    String lastName = "";
-			    String firstName= "";
-			    if(name.split("\\w+").length>1){
-
-			       lastName = name.substring(name.lastIndexOf(" ")+1);
-			       firstName = name.substring(0, name.lastIndexOf(' '));
-			    }
-			     else{
-			       firstName = name;
-			    }
+	public CustomerAccount updateCustomerAccountSummary(HashMap<String, String> summaryRequest, String id) throws Exception {
 		
-		CustomerAccount user = new CustomerAccount();
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setEmailId(email);
-		Optional<AccountType> a = accountType.findById(Long.parseLong("4"));
-		if(a.isPresent())
-		user.setAccountType(a.get());
-		Optional<CustomerCurrency> c = customerCurrency.findById(Long.parseLong("1"));
-		if(c.isPresent())
-		user.setCustomerCurrency(c.get());
-		user.setProvider(auth);
-		user.setEmailVerified(false);
-		user.setPasswordResetCompleted(false);
-		user.setMobileVerified(false);
-		user.setProvider(AuthProvider.local);
-		userRepo.save(user);
+		Optional<CustomerAccount> customerAccountbyId = userRepo.findById(id);
+		if(customerAccountbyId.isPresent()) {
+			if(userRepo.findByMobileNo(summaryRequest.get("mobile")).isPresent()) {
+				throw new Exception("User is already registered with this mobile no. from another account");
+			}
+			if(userRepo.findByEmailId(summaryRequest.get("email")).isPresent()) {
+				throw new Exception("User is already registered with this email from another account");
+			}
+			
+			CustomerAccount user = customerAccountbyId.get();
+			if(summaryRequest.get("firstname") != null)
+			user.setFirstName(summaryRequest.get("firstname"));
+			if(summaryRequest.get("lastname") != null)
+			user.setLastName(summaryRequest.get("lastname"));
+			if(summaryRequest.get("email") != null)
+			user.setEmailId(summaryRequest.get("email"));
+			if(summaryRequest.get("mobile") != null)
+			user.setMobileNo(summaryRequest.get("mobile"));
+			
+			userRepo.save(user);
+			return user;
+		} else {
+			throw new Exception("User not found.");
+		}
+		
 	}
 
 	@Override
-	public void updateNewCustomerAfterOauthLoginSuccess(CustomerAccount customer, String name, AuthProvider auth) {
+	public CustomerAccount customerAccount(String id) throws Exception {
+		Optional<CustomerAccount> customerAccountbyId = userRepo.findById(id);
 		
-		customer.setFirstName(name);
-		customer.setProvider(auth);
+		if(customerAccountbyId.isPresent()) {
+			return customerAccountbyId.get();		
+		}
+		else {
+			throw new Exception("User not found.");
+		}
 		
 	}
 }

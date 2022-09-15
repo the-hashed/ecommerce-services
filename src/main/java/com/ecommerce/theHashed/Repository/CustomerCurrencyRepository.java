@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.ecommerce.theHashed.model.CustomerCurrency;
 
 @Repository
-public interface CustomerCurrencyRepository extends JpaRepository<CustomerCurrency, Long> {
+public interface CustomerCurrencyRepository extends JpaRepository<CustomerCurrency, String> {
 
 	Optional<CustomerCurrency> findByCurrencyName(String string);
 
